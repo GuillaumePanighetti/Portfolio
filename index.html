@@ -1,0 +1,799 @@
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guillaume Panighetti - Web Developer &amp; UX-UI Designer</title>
+    <meta name="description"
+        content="Portfolio de Guillaume Panighetti. Développeur web et designer UX/UI basé à Lyon.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/logo.png">
+
+    <!-- Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+
+    <!-- Critical Loader Styles -->
+    <style>
+        :root {
+            --color-bg: #0a0a0a;
+            --color-white: #ffffff;
+            --color-white-muted: rgba(255, 255, 255, 0.4);
+            --color-accent: #ff4d00;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Outfit', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --space-lg: clamp(1.5rem, 1rem + 2vw, 3rem);
+            --text-xs: clamp(0.625rem, 0.5rem + 0.25vw, 0.75rem);
+            --text-4xl: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+            --text-5xl: clamp(3rem, 2rem + 5vw, 7rem);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 300;
+            line-height: 1.6;
+            color: var(--color-white);
+            background-color: var(--color-bg);
+            overflow-x: hidden;
+        }
+
+        body.loading {
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 99990;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .mono-text {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .loader {
+            position: fixed;
+            inset: 0;
+            background-color: var(--color-accent);
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 2rem;
+            overflow: hidden;
+        }
+
+        .loader__content {
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .loader__logo {
+            width: 100px;
+            height: 100px;
+        }
+
+        .loader__logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .loader__logo path {
+            stroke-dasharray: 70;
+            stroke-dashoffset: 70;
+            transition: stroke-dashoffset 2.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader.is-animating .loader__logo path {
+            stroke-dashoffset: 0;
+        }
+
+        .loader__bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            width: 200px;
+        }
+
+        .loader__progress {
+            width: 100%;
+            height: 2px;
+            background-color: rgba(10, 10, 10, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loader__progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--color-bg);
+            transition: width 0.1s ease-out;
+        }
+
+        .loader__info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .loader__name {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--color-bg);
+        }
+
+        .loader__percent {
+            font-family: var(--font-mono);
+            font-size: var(--text-xs);
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: var(--color-bg);
+        }
+
+        .loader.loaded {
+            animation: loaderExit 0.8s var(--ease-out-expo) forwards;
+        }
+
+        @keyframes loaderExit {
+            0% {
+                clip-path: polygon(-50% 0, 100% 0, 150% 100%, 0% 100%);
+            }
+
+            100% {
+                clip-path: polygon(-50% 0, -50% 0, 0% 100%, 0% 100%);
+            }
+        }
+    </style>
+    <!-- Non-critical CSS (Loaded asynchronously) -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Outfit:wght@300;400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&amp;display=swap"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="assets/styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="assets/styles/main.css">
+    </noscript>
+
+    <script src="assets/scripts/main.js" defer=""></script>
+</head>
+
+<body class="">
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Loader -->
+    <div class="loader is-animating loaded" id="loader" style="display: none;">
+        <div class="loader__content">
+            <div class="loader__logo">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g transform="translate(50 50)" stroke="#0a0a0a" stroke-width="8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32"></path>
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(90)"></path>
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(180)"></path>
+                        <path d="M -18 -42 Q -10 -25 0 -12 Q 8 -20 14 -32" transform="rotate(270)"></path>
+                    </g>
+                </svg>
+            </div>
+            <div class="loader__bottom">
+                <div class="loader__progress">
+                    <div class="loader__progress-bar" style="width: 99.8175%;"></div>
+                </div>
+                <div class="loader__info">
+                    <span class="loader__name">Guillaume Panighetti</span>
+                    <span class="loader__percent">100%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Transition Overlay -->
+    <div class="page-transition">
+        <div class="page-transition__panel"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" style="left: 1287px; top: 302px;"></div>
+    <div class="cursor-follower" style="left: 1287px; top: 302px;"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="nav__brand">
+                <img src="assets/images/logo.png" alt="Guillaume Panighetti" class="nav__logo">
+                <span class="nav__name mono-text">Guillaume Panighetti</span>
+            </a>
+            <ul class="nav__links">
+                <li><a href="#work" class="nav__link">Projets</a></li>
+                <li><a href="#services" class="nav__link">Services</a></li>
+                <li><a href="#contact" class="nav__link nav__link--cta">Discutons</a></li>
+            </ul>
+            <button class="nav__menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Fullscreen Menu (Mobile) -->
+    <div class="fullscreen-menu">
+        <nav class="fullscreen-menu__nav">
+            <a href="#work" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">01</span>
+                <span class="fullscreen-menu__link-text">Projets</span>
+            </a>
+            <a href="#services" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">03</span>
+                <span class="fullscreen-menu__link-text">Services</span>
+            </a>
+            <a href="#contact" class="fullscreen-menu__link">
+                <span class="fullscreen-menu__link-number">04</span>
+                <span class="fullscreen-menu__link-text">Contact</span>
+            </a>
+        </nav>
+        <div class="fullscreen-menu__footer">
+            <div class="fullscreen-menu__socials">
+                <a href="https://www.linkedin.com/in/guillaume-panighetti/" target="_blank"
+                    class="fullscreen-menu__social mono-text">LinkedIn</a>
+            </div>
+            <span class="fullscreen-menu__location mono-text">Lyon, France</span>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero__bg-text" style="transform: translate(-50%, calc(-50% + 23.1px));">Portfolio</div>
+
+        <div class="hero__decorations">
+            <div class="hero__decoration hero__decoration--1"></div>
+            <div class="hero__decoration hero__decoration--2"></div>
+        </div>
+
+        <div class="hero__spacer"></div>
+
+        <div class="hero__content">
+            <div class="hero__main">
+                <p class="hero__label mono-text"
+                    style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+                    <span class="hero__label-line"></span>
+                    Web Developer &amp; UX-UI Designer
+                </p>
+                <h1 class="hero__title">
+                    <span class="hero__title-line"
+                        style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">Portfolio
+                        de</span>
+                    <span class="hero__title-line"
+                        style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">Guillaume</span>
+                    <span class="hero__title-line"
+                        style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">Panighetti</span>
+                </h1>
+            </div>
+
+            <div class="hero__aside">
+                <div class="hero__location mono-text">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Lyon, FR
+                </div>
+                <div class="hero__cta"
+                    style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+                    <div class="btn-wrapper" data-bg-text="PROJETS" style="--translate-x: 0px; --translate-y: 0px;">
+                        <a href="#work" class="btn btn--primary">
+                            <span>Voir les projets</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="btn-wrapper" data-bg-text="CV" style="--translate-x: 0px; --translate-y: 0px;">
+                        <a href="assets/files/CV_GuillaumePanighetti.pdf" target="_blank" class="btn btn--secondary">
+                            <span>Télécharger CV</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero__stats"
+                    style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+                    <div class="stat">
+                        <span class="stat__number">Master</span>
+                        <span class="stat__label mono-text">Developpement &amp; Design</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">Informatique</span>
+                        <span class="stat__label mono-text">CIM (Conception et Intégration Multimédia)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero__scroll">
+            <span class="mono-text">Scroll</span>
+            <div class="hero__scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="marquee">
+        <div class="marquee__track">
+            <span class="marquee__item">UI Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">UX Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Front-end Dev</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Full-stack Dev</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Web Software</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">UI Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">UX Design</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Front-end Dev</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Full-stack Dev</span>
+            <span class="marquee__separator">◆</span>
+            <span class="marquee__item">Web Software</span>
+            <span class="marquee__separator">◆</span>
+        </div>
+    </div>
+
+    <!-- Work Section -->
+    <section id="work" class="work">
+        <div class="section-header"
+            style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="section-header__label">
+                <span class="mono-text">01</span>
+                <span class="mono-text">Mon travail</span>
+            </div>
+            <h2 class="section-header__title">Mes Projets</h2>
+        </div>
+
+        <div class="bento-grid">
+
+            <article class="bento-item bento-item--large" data-project="portfolio"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s; z-index: 1; --mouse-x: 99.28680322499652%; --mouse-y: 75.24841718913022%;">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <img src="assets/images/UCCM.png" alt="Portfolio" loading="lazy">
+                        <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">VUE.JS</span>
+                            <span class="tag mono-text">Maquette</span>
+                            <span class="tag mono-text">Design</span>
+                        </div>
+                        <h3 class="bento-item__title">Un Coin Chez Moi</h3>
+                        <span class="bento-item__year mono-text">2024 - 2025</span>
+                    </div>
+            </article>
+
+            <article class="bento-item bento-item--medium" data-project="ccp"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s; z-index: 1; --mouse-x: 52.74287079968916%; --mouse-y: 3.1779149382712277%;">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <img src="assets/images/mqm.png" alt="MaQuestionMedicale" loading="lazy">
+                        <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">ERP</span>
+                            <span class="tag mono-text">VUE.JS</span>
+                            <span class="tag mono-text">Symfony</span>
+                        </div>
+                        <h3 class="bento-item__title">MaQuestionMedicale</h3>
+                        <p class="bento-item__desc">Refonte de l'UX/UI Design du site</p>
+                        <span class="bento-item__year mono-text">2025</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="bento-item bento-item--medium" data-project="modnation"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s; z-index: 1; --mouse-x: 36.52884647024085%; --mouse-y: 35.94085776158907%;">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <img src="assets/images/bpmn.png" alt="BPMN" loading="lazy">
+                        <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">ERP</span>
+                            <span class="tag mono-text">Vue.js</span>
+                            <span class="tag mono-text">API</span>
+                        </div>
+                        <h3 class="bento-item__title">BPMN</h3>
+                        <p class="bento-item__desc">Feature de diagramme de modélisation pour les processus métiers sur
+                            un ERP</p>
+                        <span class="bento-item__year mono-text">2024</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 4 - Small : Portfolio -->
+            <article class="bento-item bento-item--small" data-project="optiwits"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <img src="assets/images/blue.png" alt="OptiWITS" loading="lazy">
+                        <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">Parcours utilisateur</span>
+                            <span class="tag mono-text">UX/UI</span>
+                            <span class="tag mono-text">Figma</span>
+                        </div>
+                        <h3 class="bento-item__title">Blue</h3>
+                        <p class="bento-item__desc">Elle sert à désigner un sam</p>
+                        <span class="bento-item__year mono-text">2022</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 5 - Small : Secret Project -->
+            <article class="bento-item bento-item--small" data-project="secret"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <img src="assets/images/jeuFrEnergyAccueil.png" alt="Secret Project" loading="lazy">
+                        <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">Maquette</span>
+                            <span class="tag mono-text">UX/UI</span>
+                            <span class="tag mono-text">Design</span>
+                        </div>
+                        <h3 class="bento-item__title">Création de jeu</h3>
+                        <span class="bento-item__year mono-text">2023</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project 6 - Wide : YouTube -->
+            <article class="bento-item bento-item--wide" data-project="youtube"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s; z-index: 1; --mouse-x: 37.85231604349115%; --mouse-y: 16.23945636229918%;">
+                <div class="bento-item__link">
+                    <div class="bento-item__image">
+                        <img src="assets/images/calepin.png" alt="" loading="lazy">
+                        <div class="bento-item__overlay"></div>
+                        <div class="bento-item__arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="bento-item__content">
+                        <div class="bento-item__tags">
+                            <span class="tag mono-text">Full-stack</span>
+                            <span class="tag mono-text">Windev</span>
+                        </div>
+                        <h3 class="bento-item__title">Calepin</h3>
+                        <p class="bento-item__desc">Réalisation d'une application dans une entreprise d'échafaudage</p>
+                        <span class="bento-item__year mono-text">2022</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+
+    <!-- Services Section -->
+    <section id="services" class="services" style="padding-top: 25px; background-color: rgba(99, 99, 99, 0.4);">
+        <div class="section-header section-header--center"
+            style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;">
+            <div class="section-header__label">
+                <span class="mono-text">02</span>
+                <span class="mono-text">SERVICES</span>
+            </div>
+            <h2 class="section-header__title">Ce que je <em>propose</em></h2>
+        </div>
+
+        <div class="services__grid">
+            <article class="service-card"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.55s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.55s;">
+                <div class="service-card__number mono-text">01</div>
+                <h3 class="service-card__title">Creative Front-End</h3>
+                <p class="service-card__desc">
+                    Expériences web immersives. Je donne vie aux designs avec une
+                    attention obsessionnelle aux détails, à la fluidité et à la performance.
+                </p>
+                <ul class="service-card__list mono-text">
+                    <li>Expérience &amp; Clarté</li>
+                    <li>Responsive &amp; Accessibilité</li>
+                    <li>Performance &amp; Optimisation</li>
+                </ul>
+            </article>
+
+            <article class="service-card"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s; --mouse-x: 60.82288282539191%; --mouse-y: 45.03589833016215%;">
+                <div class="service-card__number mono-text">02</div>
+                <h3 class="service-card__title">Back-End Solutions</h3>
+                <p class="service-card__desc">
+                    Applications web robustes. Une vision globale de l'architecture
+                    pour des solutions évolutives, du serveur jusqu'au navigateur.
+                </p>
+                <ul class="service-card__list mono-text">
+                    <li>Architecture Évolutive</li>
+                    <li>Conception d'API</li>
+                    <li>Modélisation de Données</li>
+                </ul>
+            </article>
+
+            <article class="service-card"
+                style="opacity: 1; transform: translateY(0px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.65s, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.65s;">
+                <div class="service-card__number mono-text">03</div>
+                <h3 class="service-card__title">UI &amp; Product Design</h3>
+                <p class="service-card__desc">
+                    Le design pensé par un développeur. Conception d'interfaces
+                    esthétiques, fonctionnelles et techniquement maîtrisées.
+                </p>
+                <ul class="service-card__list mono-text">
+                    <li>Design Systems</li>
+                    <li>Prototypage Interactif</li>
+                    <li>Maquettes "Dev-Ready"</li>
+                </ul>
+            </article>
+        </div>
+
+        <!-- Mobile carousel navigation -->
+        <div class="services__carousel-nav">
+            <button class="services__nav-btn services__nav-btn--prev" aria-label="Précédent">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <div class="services__dots">
+                <button class="services__dot active" data-index="0" aria-label="Service 1"></button>
+                <button class="services__dot" data-index="1" aria-label="Service 2"></button>
+                <button class="services__dot" data-index="2" aria-label="Service 3"></button>
+            </div>
+            <button class="services__nav-btn services__nav-btn--next" aria-label="Suivant">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="contact__bg-text">CONTACT</div>
+
+        <div class="contact__decorations">
+            <div class="contact__decoration contact__decoration--1"></div>
+            <div class="contact__decoration contact__decoration--2"></div>
+        </div>
+
+        <div class="contact__content">
+            <div class="contact__main">
+                <p class="contact__label mono-text">
+                    <span class="contact__label-line"></span>
+                    03 — Let's Connect
+                </p>
+                <h2 class="contact__title">
+                    <span class="contact__title-line">Une idée,</span>
+                    <span class="contact__title-line">un <em>projet</em> ?</span>
+                </h2>
+            </div>
+
+            <div class="contact__aside">
+                <div class="contact__cta">
+                    <div class="btn-wrapper" data-bg-text="EMAIL">
+                        <a href="mailto:guillaumepanighetti@gmail.com" class="btn btn--primary btn--large">
+                            <span>guillaumepanighetti@gmail.com</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="contact__links">
+                    <a href="https://www.linkedin.com/in/guillaume-panighetti/" target="_blank" class="contact__link">
+                        <span>LinkedIn</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                        </svg>
+                    </a>
+                    <a href="tel:+33612246281" class="contact__link">
+                        <span>+33 6 12 24 62 81</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M7 17L17 7M17 7H7M17 7V17"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact__footer">
+            <!-- <div class="contact__status">
+                <span class="contact__status-dot"></span>
+                <span class="mono-text">Disponible</span>
+            </div> -->
+            <div class="contact__location mono-text">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Lyon, FR
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Modal -->
+    <div class="project-modal" id="projectModal">
+        <div class="project-modal__backdrop"></div>
+        <div class="project-modal__container">
+            <button class="project-modal__close" aria-label="Fermer">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <div class="project-modal__content">
+                <div class="project-modal__header">
+                    <span class="project-modal__number mono-text">01</span>
+                    <div class="project-modal__tags"></div>
+                </div>
+
+                <h2 class="project-modal__title"></h2>
+                <p class="project-modal__subtitle"></p>
+
+                <div class="project-modal__image">
+                    <div class="project-modal__image-placeholder">
+                        <span class="mono-text">PROJECT.WEBP</span>
+                    </div>
+                </div>
+
+                <div class="project-modal__details">
+                    <div class="project-modal__info">
+                        <div class="project-modal__info-item">
+                            <span class="mono-text">ANNÉE</span>
+                            <p class="project-modal__year"></p>
+                        </div>
+                    </div>
+
+                    <div class="project-modal__description"></div>
+
+                    <div class="project-modal__stack">
+                        <span class="mono-text">TECHNOLOGIES</span>
+                        <div class="project-modal__stack-list"></div>
+                    </div>
+                </div>
+
+                <div class="project-modal__actions">
+                    <!-- Dynamic buttons will be injected here -->
+                </div>
+
+                <!-- Navigation intégrée dans le contenu scrollable -->
+                <div class="project-modal__nav">
+                    <button class="project-modal__nav-btn project-modal__nav-btn--prev" aria-label="Projet précédent">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                        </svg>
+                        <span class="mono-text">PRÉCÉDENT</span>
+                    </button>
+                    <button class="project-modal__nav-btn project-modal__nav-btn--next" aria-label="Projet suivant">
+                        <span class="mono-text">SUIVANT</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__grid">
+            <div class="footer__col">
+                <p class="footer__tagline">Guillaume Panighetti</p>
+            </div>
+            <div class="footer__col">
+                <span class="footer__label mono-text">LOCATION</span>
+                <p>Lyon, France</p>
+            </div>
+            <div class="footer__col">
+                <span class="footer__label mono-text">NAVIGATION</span>
+                <nav class="footer__nav">
+                    <a href="#work">Projets</a>
+                    <a href="#contact">Contact</a>
+                </nav>
+            </div>
+            <div class="footer__col">
+                <span class="footer__label mono-text">RESSOURCES</span>
+                <nav class="footer__nav">
+                    <a href="assets/files/CV_GuillaumePanighetti.pdf" target="_blank">Télécharger CV</a>
+                </nav>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <span class="mono-text">© 2026 Guillaume Panighetti</span>
+        </div>
+    </footer>
+
+
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox__close" aria-label="Fermer">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div class="lightbox__content">
+            <img src="" alt="" class="lightbox__img">
+        </div>
+    </div>
+</body>
+
+</html>
