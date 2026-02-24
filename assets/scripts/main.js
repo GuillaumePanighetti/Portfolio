@@ -600,7 +600,7 @@ function initProjectModal() {
             tags: ['Full-stack', 'Windev'],
             stack: ['Full-stack', 'Windev'],
             images: [
-                'assets/images/Calepin.png'
+                'assets/images/calepin.png'
             ],
         }
     };
