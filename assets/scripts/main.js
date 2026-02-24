@@ -529,8 +529,8 @@ function initProjectModal() {
             description: `
             Refonte et front-end de l'UX/UI Design du site MaQuestionMedicale, un site spécialisé dans la santé qui permet de faire des téléconsultations médicales avec des médecins.
             `,
-            tags: ['B2B', 'CRM', 'PHP'],
-            stack: ['Vue.JS', 'PHP', 'MySQL', 'JavaScript', 'Symfony', 'GitHub'],
+            tags: ['ERP', 'Vue.js', 'Symfony'],
+            stack: ['Vue.JS', 'Figma', 'MySQL', 'JavaScript', 'Symfony', 'GitHub'],
             images: [
                 'assets/images/mqm.png',
             ],
