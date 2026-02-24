@@ -532,7 +532,7 @@ function initProjectModal() {
             tags: ['B2B', 'CRM', 'PHP'],
             stack: ['Vue.JS', 'PHP', 'MySQL', 'JavaScript', 'Symfony', 'GitHub'],
             images: [
-                'assets/images/MQM.png',
+                'assets/images/mqm.png',
             ],
         },
         modnation: {
